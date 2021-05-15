@@ -1,3 +1,4 @@
+import tkinter
 from tkinter.constants import FALSE, NO
 from mysocket import MySocket
 import mysocket as msk
@@ -6,6 +7,7 @@ from scrshot_ui import scrshot_ui
 from keystroke_ui import keystroke_ui
 import tkinter as tk
 import tkinter as tk
+from manager_ui import Manager_ui
 HOST = "127.0.0.1"
 PORT = 65432
 
@@ -21,26 +23,52 @@ class Main(tk.Frame):
         self.master.grid_columnconfigure(0,weight=1)
         self.master.resizable(False,False)
         self.grid()
-        self.create_widgets()
         self.socket=None
         self.is_running=False
-        self.subroot=[None]*2
+        self.subroot=[None]*6
+        self.create_widgets()
     def create_widgets(self):
-        self.entry=tk.Entry(width=50)
+        self.entry=tk.Entry(self,width=50)
         self.entry.grid(row=0,column=0,columnspan=5,padx=10,pady=10)
-        self.contents=tk.StringVar()
+        self.contents=tk.StringVar(self)
         self.contents.set("Nhập địa chỉ IP")
         self.entry["textvariable"]=self.contents
-        self.Connect=tk.Button(text="Connect",width=10,height=1)
+        self.Connect=tk.Button(self,text="Connect",width=10,height=1)
         self.Connect.grid(row=0,column=5,sticky=tk.NE,padx=10,pady=10)
         self.Connect['command']=self.connect
-        self.Screenshot=tk.Button(text="ScreenShot",height=2,width=10)
+        self.Screenshot=tk.Button(self,text="ScreenShot",height=2,width=10)
         self.Screenshot.grid(row=1,column=0,sticky=tk.NW,padx=10,pady=10)
         self.Screenshot["command"]=self.create_screenshot
-        self.Keystroke=tk.Button(text="KeyStroke",width=10,height=2)
+        self.Keystroke=tk.Button(self,text="KeyStroke",width=10,height=2)
         self.Keystroke.grid(row=2,column=0,sticky=tk.NW,padx=10,pady=10)
         self.Keystroke['command']=self.create_keystroke
+        self.Process_Running=tk.Button(self,text="Process Running",width=10,height=10,wraplength=50)
+        self.Process_Running.grid(row=1,column=1,rowspan=2,padx=10,pady=10)
+        self.Process_Running["command"]=self.create_process_running
+        self.App_Running=tk.Button(self,text="App Running",width=10,height=10,wraplength=50)
+        self.App_Running.grid(row=1,column=2,rowspan=2,padx=10,pady=10)
+        self.App_Running["command"]=self.create_app_running
         self.master.protocol("WM_DELETE_WINDOW", self.on_exit)
+    def create_app_running(self):
+        if self.check():
+            return
+        if not self.is_connected:
+            messagebox.showerror("FAIL TO ATTEMPT","NOT CONNECTED YET")
+            return
+        self.socket.client.sendall(bytes("APP","utf8"))
+        approot=tk.Toplevel(self.master)
+        self.subroot[3]=Manager_ui(approot,self.socket,"App")
+        self.subroot[3].mainloop()
+    def create_process_running(self):
+        if self.check():
+            return
+        if not self.is_connected:
+            messagebox.showerror("FAIL TO ATTEMPT","NOT CONNECTED YET")
+            return
+        self.socket.client.sendall(bytes("PROCESS","utf8"))
+        processroot=tk.Toplevel(self.master)
+        self.subroot[2]=Manager_ui(processroot,self.socket,"Process")
+        self.subroot[2].mainloop()
     def create_keystroke(self):
         if self.check():
             return
@@ -76,6 +104,9 @@ class Main(tk.Frame):
     def on_exit(self):
         if self.check():
             return
+        if self.socket is None:
+            self.master.destroy()
+            return
         try:
             self.socket.client.sendall(bytes("exit","utf8"))
         except:
@@ -83,7 +114,7 @@ class Main(tk.Frame):
         self.socket.close()
         self.master.destroy()
     def check(self):
-        for i in range(2):
+        for i in range(6):
             if self.subroot[i] is not None and self.subroot[i].winfo_exists():
                 return True
         return False

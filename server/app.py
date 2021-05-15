@@ -1,15 +1,15 @@
 import os 
 import socket 
 
-class Process:
+class App:
     def __init__(self,sk):
         self.sk=sk 
-    def process_view(self):
-        output = os.popen('powershell "gps |  select name, id, {$_.Threads.Count}').read()
+    def app_view(self):
+        output = os.popen('powershell "gps | where {$_.MainWindowTitle} | select name, id, {$_.Threads.Count}').read()
         self.sk.sendall(bytes(str(len(output)),"utf8"))
         self.sk.sendall(bytes(output,"utf8"))
         pass
-    def process_kill(self,sid):
+    def app_kill(self,sid):
         if not sid.isdigit():
             self.sk.sendall(bytes("fail","utf8"))
             return
@@ -20,7 +20,7 @@ class Process:
             self.sk.sendall(bytes("fail","utf8"))
             return
         self.sk.sendall(bytes("success","utf8"))
-    def process_start(self, sid):
+    def app_start(self, sid):
         if len(sid) == 0: return
         #pname += ".exe"
         try:

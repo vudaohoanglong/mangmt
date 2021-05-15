@@ -62,4 +62,3 @@ class scrshot_ui(tk.Frame):
         self.scr.sk.client.sendall(bytes("exit","utf8"))
         #self.scr.sk.close()
         self.master.destroy()
-
