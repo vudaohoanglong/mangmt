@@ -1,6 +1,7 @@
 import os 
-import socket 
-
+import socket
+# shut the fuck up
+# chiu luon day
 class App:
     def __init__(self,sk):
         self.sk=sk 

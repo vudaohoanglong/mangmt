@@ -118,7 +118,7 @@ class Main(tk.Frame):
                         elif cmd=="exit":
                             break
                 elif bigcmd=="REGISTRY":
-                    #print("haaha")
+                    #print("haaha hahaha cc")
                     registry=Registry(self.conn)
                     registry.run_process()
                 elif bigcmd=="SHUTDOWN":
@@ -134,7 +134,7 @@ class Main(tk.Frame):
         if self.conn is not None:
             self.conn.close()
         self.master.destroy()
-
+# ???????????????????????????
 mainroot=tk.Tk()
 mainUI=Main(mainroot)
 mainUI.mainloop()
